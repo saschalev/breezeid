@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BreezeID Browser Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-top: 0;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .output {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        .id-display {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2196F3;
+            margin: 5px 0;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍃 BreezeID Browser Test</h1>
+        
+        <div class="status success" id="status">
+            ✓ Browser crypto API detected and ready
+        </div>
+
+        <div class="test-section">
+            <h3>Test 1: Default Length (16 characters)</h3>
+            <button onclick="testDefault()">Generate Default ID</button>
+            <div class="output" id="output1"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 2: Custom Length</h3>
+            <button onclick="testCustom(8)">Generate 8 chars</button>
+            <button onclick="testCustom(12)">Generate 12 chars</button>
+            <button onclick="testCustom(24)">Generate 24 chars</button>
+            <div class="output" id="output2"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 3: Multiple IDs</h3>
+            <button onclick="testMultiple(10)">Generate 10 IDs</button>
+            <button onclick="testMultiple(50)">Generate 50 IDs</button>
+            <div class="output" id="output3"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Test 4: Uniqueness Check</h3>
+            <button onclick="testUniqueness()">Generate 1000 IDs and check uniqueness</button>
+            <div class="output" id="output4"></div>
+        </div>
+    </div>
+
+    <!-- Simple CommonJS loader -->
+    <script>
+        // Minimal CommonJS require/module system for browser
+        const modules = {};
+        const require = function(moduleName) {
+            if (modules[moduleName]) {
+                return modules[moduleName].exports;
+            }
+            throw new Error(`Module ${moduleName} not found`);
+        };
+
+        const defineModule = function(name, factory) {
+            const module = { exports: {} };
+            modules[name] = module;
+            factory(require, module.exports, module);
+            return module.exports;
+        };
+    </script>
+
+    <!-- Load profanities.js -->
+    <script>
+        defineModule('./profanities', function(require, exports, module) {
+            const profanities = ['fuck', 'boob', 'spit', 'suck', 'cum', "5h1t", "5hit", "anus", "arse", "cock", "clit", "cunt", "dick", "nigg", "gays", "kike", "hell", "homo", "nips", "peni5", "piss", "slut", "slop", 'yaoi', 'yiff', 'jerk', 'bewb', 'n1gg', 'thug', 'lgbt', 'dupa', 'nazi', 'oral', 'anal', 'poop', 'scat', 'sexy', 'scum', 'smut', ' tits', 'twat', 'rape', 'jerk', 'fagg', 'turd', 'spic', 'kike', 'porn', 'lube', 'ass', 'fag', 'jizz', 'shit', 'dyke', 'wank', 'damn', 'crap', 'cuck', 'pawg'];
+            module.exports = { profanities };
+        });
+    </script>
+
+    <!-- Load breezeid.js as a module -->
+    <script>
+        // Wrap breezeid.js execution in a module
+        defineModule('./breezeid', function(require, exports, module) {
+            // Browser-compatible crypto: use Web Crypto API in browsers, Node.js crypto in Node.js
+            const getRandomBytes = (() => {
+              // Check if we're in a browser environment
+              if (
+                typeof window !== "undefined" &&
+                window.crypto &&
+                window.crypto.getRandomValues
+              ) {
+                // Browser: use Web Crypto API
+                return (size) => {
+                  const arr = new Uint8Array(size);
+                  window.crypto.getRandomValues(arr);
+                  return arr;
+                };
+              } else if (
+                typeof globalThis !== "undefined" &&
+                globalThis.crypto &&
+                globalThis.crypto.getRandomValues
+              ) {
+                // Browser/Web Worker: use Web Crypto API from globalThis
+                return (size) => {
+                  const arr = new Uint8Array(size);
+                  globalThis.crypto.getRandomValues(arr);
+                  return arr;
+                };
+              } else {
+                // Node.js: use crypto module (won't work in browser, but kept for compatibility)
+                throw new Error("No crypto API available");
+              }
+            })();
+
+            const charset = "AEIUQWTYPSDFGRHJKLZXCVBNM2346789";
+            const { profanities } = require("./profanities");
+
+            const poolSize = 16 * 8; // default id length * 8 = 128
+            let pool;
+            let poolIndex = 0;
+
+            fillPool();
+            function fillPool() {
+              pool = getRandomBytes(poolSize);
+            }
+
+            function hasProfanity(input) {
+              return profanities.some(function (v) {
+                return input.toLowerCase().indexOf(v) >= 0;
+              });
+            }
+
+            function breezeid(length = 4 * 4) {
+              if (length > poolSize) {
+                throw new Error(
+                  `breezeid: Max ID length (${poolSize}) exceeded. Increase the pool size in source.`
+                );
+              }
+
+              return insertHyphens(genChars(length));
+            }
+
+            function genChars(length) {
+              let result = "";
+
+              // if amount to generate exceeds pool size, refill the pool
+              if (poolIndex + length >= pool.length) {
+                fillPool();
+                poolIndex = 0;
+              }
+
+              for (let i = 0; i < length; i++) {
+                result += charset[pool[poolIndex] % charset.length];
+                poolIndex++;
+              }
+              return result;
+            }
+
+            function insertHyphens(input, every = 4, joinBy = "-") {
+              let result = [];
+              let position = 0;
+              for (let index = 0; index < input.length / every; index++) {
+                let fragment = input.slice(position, position + every);
+                if (hasProfanity(fragment)) {
+                  fragment = genChars(fragment.length);
+                  if (hasProfanity(fragment)) {
+                    fragment = fragment.split("").toReversed().join("");
+                  }
+                }
+
+                result.push(fragment);
+
+                position += every;
+              }
+              return result.join(joinBy);
+            }
+
+            module.exports = { breezeid, BreezeID: breezeid };
+        });
+    </script>
+
+    <!-- Test script -->
+    <script>
+        // Wait for breezeid to be loaded
+        window.addEventListener('DOMContentLoaded', function() {
+            // Check if breezeid is available
+            if (typeof require === 'function') {
+                try {
+                    const { breezeid } = require('./breezeid');
+                    window.breezeid = breezeid;
+                    
+                    // Test that it works
+                    const testId = breezeid();
+                    console.log('BreezeID loaded successfully:', testId);
+                } catch (e) {
+                    document.getElementById('status').className = 'status error';
+                    document.getElementById('status').textContent = '✗ Error loading BreezeID: ' + e.message;
+                    console.error(e);
+                }
+            }
+        });
+
+        function testDefault() {
+            try {
+                const { breezeid } = require('./breezeid');
+                const id = breezeid();
+                document.getElementById('output1').innerHTML = 
+                    '<div class="id-display">' + id + '</div>' +
+                    '<div>Length: ' + id.replace(/-/g, '').length + ' characters</div>';
+            } catch (e) {
+                document.getElementById('output1').innerHTML = 
+                    '<div class="status error">Error: ' + e.message + '</div>';
+            }
+        }
+
+        function testCustom(length) {
+            try {
+                const { breezeid } = require('./breezeid');
+                const id = breezeid(length);
+                document.getElementById('output2').innerHTML = 
+                    '<div class="id-display">' + id + '</div>' +
+                    '<div>Requested length: ' + length + ', Actual length: ' + id.replace(/-/g, '').length + ' characters</div>';
+            } catch (e) {
+                document.getElementById('output2').innerHTML = 
+                    '<div class="status error">Error: ' + e.message + '</div>';
+            }
+        }
+
+        function testMultiple(count) {
+            try {
+                const { breezeid } = require('./breezeid');
+                const ids = [];
+                for (let i = 0; i < count; i++) {
+                    ids.push(breezeid());
+                }
+                document.getElementById('output3').innerHTML = 
+                    '<div><strong>Generated ' + count + ' IDs:</strong></div>' +
+                    ids.map(id => '<div class="id-display">' + id + '</div>').join('');
+            } catch (e) {
+                document.getElementById('output3').innerHTML = 
+                    '<div class="status error">Error: ' + e.message + '</div>';
+            }
+        }
+
+        function testUniqueness() {
+            try {
+                const { breezeid } = require('./breezeid');
+                const ids = new Set();
+                const startTime = performance.now();
+                
+                for (let i = 0; i < 1000; i++) {
+                    ids.add(breezeid());
+                }
+                
+                const endTime = performance.now();
+                const uniqueCount = ids.size;
+                const duplicates = 1000 - uniqueCount;
+                const timeTaken = (endTime - startTime).toFixed(2);
+                
+                document.getElementById('output4').innerHTML = 
+                    '<div><strong>Results:</strong></div>' +
+                    '<div>Total generated: 1000</div>' +
+                    '<div>Unique IDs: ' + uniqueCount + '</div>' +
+                    '<div>Duplicates: ' + duplicates + '</div>' +
+                    '<div>Time taken: ' + timeTaken + ' ms</div>' +
+                    '<div>Average: ' + (timeTaken / 1000).toFixed(3) + ' ms per ID</div>' +
+                    (duplicates === 0 ? 
+                        '<div class="status success" style="margin-top: 10px;">✓ All IDs are unique!</div>' :
+                        '<div class="status error" style="margin-top: 10px;">✗ Found ' + duplicates + ' duplicate(s)</div>');
+            } catch (e) {
+                document.getElementById('output4').innerHTML = 
+                    '<div class="status error">Error: ' + e.message + '</div>';
+            }
+        }
+    </script>
+</body>
+</html>
+
