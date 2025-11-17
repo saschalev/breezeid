@@ -7,6 +7,8 @@
   <img src="https://img.shields.io/badge/support%20me%20on-ko--fi-pink?logo=ko-fi&logoColor=pink&logoWidth=20&style=for-the-badge"/>
 </a>
 
+> **Note:** This is a fork of [Breeze ID](https://github.com/tzwel/breezeid) that adds **browser compatibility**. The original package only worked in Node.js environments. This fork automatically detects the environment and uses the Web Crypto API (`crypto.getRandomValues()`) in browsers and Web Workers, while maintaining full compatibility with Node.js using `crypto.randomBytes()`. Works seamlessly in both browser and Node.js environments!
+
 Breeze ID is a library that generates unique IDs of any length meant to be easily communicated via speech, that contain no profanities and consist of unambigous characters that can be read easily. Breeze ID's goal is to eliminate human error and still be cryptographically secure.
 
 Breeze ID is best used wherever your IDs:
@@ -23,6 +25,8 @@ npm i breezeid
 ```
 
 ## Use
+
+### Node.js
 ```javascript
 const { breezeid } = require('breezeid') // or { BreezeID }
 
@@ -31,7 +35,17 @@ breezeid() // => 9NU6-XQLZ-BDIH-6HKE
 
 // Specify custom length (excluding hyphens):
 breezeid(8) // => Q228-VQUR
+```
 
+### Browser
+Works seamlessly in browsers! The package automatically detects the browser environment and uses the Web Crypto API. You can use it with a bundler (like webpack, rollup, or browserify) or load it directly in a browser with a CommonJS loader (see `test.html` for an example).
+
+```javascript
+const { breezeid } = require('breezeid')
+
+// Works the same way in browsers!
+breezeid() // => 9NU6-XQLZ-BDIH-6HKE
+breezeid(8) // => Q228-VQUR
 ```
 
 ### Breeze ID is
@@ -54,7 +68,9 @@ You would need to generate 156 *billion* IDs with default settings to reach 1% p
 But these numbers can still be improved - if you generate Breeze IDs of `24` length, reaching 1% probability of collision while generating 1000 ids per **second** would take ~5 **million** years. If you were to care about 50% probability (which is common when testing random ID generating libraries), this would be ~43 million years.
 
 ### Entropy
-Breeze ID uses `crypto.randomBytes` internally, meaning you get cryptographically secure entropy from your OS.
+Breeze ID uses cryptographically secure random number generation:
+- **Node.js**: Uses `crypto.randomBytes()` for entropy from your OS
+- **Browsers/Web Workers**: Uses the Web Crypto API (`crypto.getRandomValues()`) for cryptographically secure randomness
 The characters from the alphabet are then picked by the `modulo` operator. There's no modulo bias introduced as the carefully picked alphabet consists of exactly 32 characters.
 
 ## URL safe
