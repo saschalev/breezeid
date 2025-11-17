@@ -1,6 +1,6 @@
 {
   "name": "breezeid-browser",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Easily generate unique, human-first IDs",
   "main": "breezeid.js",
   "types": "breezeid.d.ts",
