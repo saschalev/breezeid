@@ -25,7 +25,7 @@ const getRandomBytes = (() => {
     };
   } else {
     // Node.js: use crypto module
-    const crypto = require("node:crypto");
+    const crypto = require("crypto");
     return (size) => {
       return crypto.randomBytes(size);
     };
