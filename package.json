@@ -3,6 +3,7 @@
   "version": "1.2.2",
   "description": "Easily generate unique, human-first IDs",
   "main": "breezeid.js",
+  "types": "breezeid.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
