@@ -1,5 +1,5 @@
 {
-  "name": "breezeid",
+  "name": "breezeid-browser",
   "version": "1.2.1",
   "description": "Easily generate unique, human-first IDs",
   "main": "breezeid.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tzwel/BreezeID.git"
+    "url": "git+https://github.com/saschalev/breezeid.git"
   },
   "keywords": [
     "id",
@@ -21,7 +21,7 @@
   "author": "Tzwel",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/tzwel/BreezeID/issues"
+    "url": "https://github.com/saschalev/breezeid/issues"
   },
-  "homepage": "https://github.com/tzwel/BreezeID#readme"
+  "homepage": "https://github.com/saschalev/breezeid#readme"
 }
